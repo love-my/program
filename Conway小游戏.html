@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<style>
+  body {
+    margin: auto;
+    margin-top: 50px;
+    width: 1000px;
+    background-color: pink;
+    border: rgba(248, 87, 115, 0.8) 2px solid;
+    padding: 10px;
+    border-radius: 50px;
+  }
+
+  .btn {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .btn button {
+    background-color: yellow;
+    font-size: 18px;
+    color: red;
+    border-radius: 5px;
+  }
+
+  form {
+    width: 1000px;
+    text-align: center;
+  }
+</style>
+
+<body>
+  <div class="btn">
+    <button id='run'>运行</button>
+    <button id='stop'>停止</button>
+    <button id='clear'>清除</button>
+    <button id='ran'>随机</button>
+    <button id='next'>下一步</button>
+    <button id='fengbi'>封闭</button>
+    <button id='kaifang'>开放</button>
+  </div>
+  <script>
+    var col = 31
+    var row = 31
+    var run = document.querySelector('#run')
+    var stopit = document.querySelector('#stop')
+    var clear = document.querySelector('#clear')
+    var ran = document.querySelector('#ran')
+    var next = document.querySelector('#next')
+    var fengbi = document.querySelector('#fengbi')
+    var kaifang = document.querySelector('#kaifang')
+    var func
+    var start = start2
+    for (var i = 0; i < row; i++) {
+      var form = document.createElement('form')
+      for (var j = 0; j < col; j++) {
+        var input = document.createElement('input')
+        input.type = 'checkbox'
+        input.checked = false
+        form.appendChild(input)
+      }
+      document.body.appendChild(form)
+    }
+
+    var isRun = false
+    run.addEventListener('click', e => {
+      if (!isRun) {
+        isRun = true
+        s()
+      }
+    })
+
+    stopit.addEventListener('click', e => {
+      isRun = false
+      clearInterval(func)
+    })
+
+    clear.addEventListener('click', e => {
+      var ipt = Array.from(document.querySelectorAll('input'))
+      ipt.forEach(it => { it.checked = false })
+    })
+
+    ran.addEventListener('click', e => {
+      var ipt = Array.from(document.querySelectorAll('input'))
+      ipt.forEach(it => { it.checked = random() })
+    })
+
+    next.addEventListener('click', e => {
+      start()
+    })
+
+    fengbi.addEventListener('click', e => {
+      start = start1
+    })
+
+    kaifang.addEventListener('click', e => {
+      start = start2
+    })
+
+    function s() {
+      func = setInterval(start, 100);
+    }
+
+    function random() {
+      var p = Math.random()
+      if (p > 0.8) {
+        return true
+      }
+      return false
+    }
+
+    function start1() {
+      var formary = document.querySelectorAll('form')
+      var ary = Array.from(formary).map(fo => {
+        return Array.from(fo.children).map(inp => inp.checked)
+      })
+      for (var k = 0; k < row; k++) {
+        for (var l = 0; l < col; l++) {
+          var c = 0
+          for (var m = k - 1; m <= k + 1; m++) {
+            if (ary[m] !== undefined) {
+              for (var n = l - 1; n <= l + 1; n++) {
+                if (ary[m][n] && (m !== k || n !== l)) {
+                  c++
+                }
+              }
+            }
+          }
+          if (c < 2 || c > 3) {
+            formary[k].children[l].checked = false
+          } else if (c == 3) {
+            formary[k].children[l].checked = true
+          }
+        }
+      }
+      delete formary
+      delete ary
+    }
+
+    function start2() {
+      var formary = document.querySelectorAll('form')
+      var ary = Array.from(formary).map(fo => {
+        return Array.from(fo.children).map(inp => inp.checked)
+      })
+      for (var k = 0; k < row; k++) {
+        for (var l = 0; l < col; l++) {
+          var c = 0
+          for (var m = k - 1; m <= k + 1; m++) {
+            var savem = m
+            if (m == -1) {
+              savem = -1
+              m = row - 1
+            } else if (m == row) {
+              savem = row
+              m = 0
+            }
+            for (var n = l - 1; n <= l + 1; n++) {
+              var saven = n
+              if (n == -1) {
+                saven = -1
+                n = col - 1
+              } else if (n == row) {
+                saven = col
+                n = 0
+              }
+              if (ary[m][n] && (m !== k || n !== l)) {
+                c++
+              }
+              n = saven
+            }
+            m = savem
+          }
+          if (c < 2 || c > 3) {
+            formary[k].children[l].checked = false
+          } else if (c == 3) {
+            formary[k].children[l].checked = true
+          }
+        }
+      }
+      delete formary
+      delete ary
+    }
+  </script>
+</body>
+
+</html>

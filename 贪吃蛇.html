@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<style>
+  input {
+    margin: 1px;
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+  }
+
+  div {
+    height: 19px;
+  }
+
+  #head {
+    box-shadow: 0 0 10px red;
+  }
+
+  #weiba {
+    box-shadow: 0 0 10px green;
+  }
+</style>
+
+<body>
+  <button class="startgame">开始游戏</button>
+  <section class="fanwei">
+  </section>
+  <script>
+    var fanwei = document.querySelector('.fanwei')
+    var startgame = document.querySelector('.startgame')
+    var start = start2
+    var width = 30
+    var high = 30
+    var startrow
+    var startcol
+    var length = 3
+    var ary = []
+    var ary2 = []
+    var head
+    var weiba
+    var go
+    var time = 300
+    var beilv = 1
+    var isfood = false
+    var shouldRunning = false
+    var direction = 'right'
+    for (var i = 0; i < high; i++) {
+      var div = document.createElement('div')
+      div.className = 'row'
+      for (var j = 0; j < width; j++) {
+        var input = document.createElement('input')
+        input.type = 'checkbox'
+        input.value = '' + i + ' ' + j
+        input.className = direction
+        div.appendChild(input)
+      }
+      fanwei.appendChild(div)
+    }
+
+    ary = Array.from(document.querySelectorAll('.row')).map(row => Array.from(row.children))
+
+    fanwei.addEventListener('click', e => {
+      e.preventDefault()
+    })
+
+    chushihua()
+    function chushihua() {
+      ary2 = []
+      startrow = Math.floor((Math.random() * high))
+      startcol = Math.floor(Math.random() * (width / 2))
+      for (var i = 0; i < ary.length; i++) {
+        for (var j = 0; j < ary[0].length; j++) {
+          ary[i][j].checked = false
+          ary[i][j].className = ''
+          ary[i][j].dataset.body = 0
+          ary[i][j].id = ''
+          direction = 'right'
+        }
+      }
+      for (var i = startcol; i < startcol + length; i++) {
+        ary[startrow][i].checked = true
+        ary[startrow][i].dataset.body = 1
+        ary[startrow][i].className = 'right'
+        ary2.push(ary[startrow][i])
+      }
+      head = ary2[ary2.length - 1]
+      head.id = 'head'
+      head.className = ''
+      weiba = ary2[0]
+      weiba.id = 'weiba'
+      food()
+      clearTimeout(go)
+    }
+
+    function food() {
+      var heng = Math.floor(Math.random() * width)
+      var shu = Math.floor(Math.random() * high)
+      if (ary[shu][heng].checked) {
+        food()
+      } else {
+        ary[shu][heng].checked = true
+      }
+    }
+
+    function GameOver() {
+      clearTimeout(go)
+      shouldRunning = false
+      alert('Game Over!')
+      return
+    }
+
+    function headnext() {
+      head.id = ''
+      var heng = head.value.split(' ')[1]
+      var shu = head.value.split(' ')[0]
+      if (direction == 'right') {
+        if (heng < width - 1) {
+          heng++
+        } else {
+          GameOver()
+          return
+        }
+      } else if (direction == 'left') {
+        if (heng > 0) {
+          heng--
+        } else {
+          GameOver()
+          return
+        }
+      } else if (direction == 'up') {
+        if (shu > 0) {
+          shu--
+        } else {
+          GameOver()
+          return
+        }
+      } else {
+        if (shu < high - 1) {
+          shu++
+        } else {
+          GameOver()
+          return
+        }
+      }
+      head.className = direction
+      head = ary[shu][heng]
+      if (head.checked) {
+        if (head.dataset.body == 1) {
+          GameOver()
+          return
+        }
+        isfood = true
+      } else {
+        head.checked = true
+        head.dataset.body = 1
+
+        head.id = 'head'
+      }
+    }
+
+    function weibanext() {
+      if (isfood) {
+        isfood = false
+        food()
+        return
+      }
+      weiba.checked = false
+      weiba.dataset.body = 0
+      var heng = weiba.value.split(' ')[1]
+      var shu = weiba.value.split(' ')[0]
+      if (weiba.className == 'right') {
+        heng++
+      } else if (weiba.className == 'left') {
+        heng--
+      } else if (weiba.className == 'up') {
+        shu--
+      } else {
+        shu++
+      }
+      weiba.id = ''
+      weiba = ary[shu][heng]
+      weiba.id = 'weiba'
+    }
+
+    function start1() {
+      go = setTimeout(() => {
+        if (shouldRunning) {
+          headnext()
+        }
+        if (shouldRunning) {
+          weibanext()
+        }
+        if (shouldRunning) {
+          start1()
+        }
+      }, time * beilv)
+    }
+
+    function start2() {
+      go = setTimeout(() => {
+        if (shouldRunning) {
+          headnext2()
+        }
+        if (shouldRunning) {
+          weibanext2()
+        }
+        if (shouldRunning) {
+          start2()
+        }
+      }, time * beilv)
+    }
+
+    function headnext2() {
+      head.id = ''
+      var heng = head.value.split(' ')[1]
+      var shu = head.value.split(' ')[0]
+      if (direction == 'right') {
+        if (heng < width - 1) {
+          heng++
+        } else {
+          heng = 0
+        }
+      } else if (direction == 'left') {
+        if (heng > 0) {
+          heng--
+        } else {
+          heng = width - 1
+        }
+      } else if (direction == 'up') {
+        if (shu > 0) {
+          shu--
+        } else {
+          shu = high - 1
+        }
+      } else {
+        if (shu < high - 1) {
+          shu++
+        } else {
+          shu = 0
+        }
+      }
+      if (head.className == '') {
+        head.className = '' + direction
+      } else {
+        head.className += ' ' + direction
+      }
+      head = ary[shu][heng]
+      if (head.checked) {
+        if (head.dataset.body != 1) {
+          isfood = true
+        }
+      }
+      head.checked = true
+      head.dataset.body = 1
+      head.id = 'head'
+    }
+
+    function weibanext2() {
+      if (isfood) {
+        isfood = false
+        food()
+        return
+      }
+      var heng = weiba.value.split(' ')[1]
+      var shu = weiba.value.split(' ')[0]
+      var weibaary = weiba.className.split(' ')
+      var fangxiang = weibaary.shift()
+      weiba.className = weibaary.join(' ')
+      if (weiba.className == '') {
+        weiba.dataset.body = 0
+        weiba.checked = false
+      }
+      if (fangxiang == 'right') {
+        if (heng < width - 1) {
+          heng++
+        } else {
+          heng = 0
+        }
+      } else if (fangxiang == 'left') {
+        if (heng > 0) {
+          heng--
+        } else {
+          heng = width - 1
+        }
+      } else if (fangxiang == 'up') {
+        if (shu > 0) {
+          shu--
+        } else {
+          shu = high - 1
+        }
+      } else {
+        if (shu < high - 1) {
+          shu++
+        } else {
+          shu = 0
+        }
+      }
+      weiba.id = ''
+      weiba = ary[shu][heng]
+      weiba.id = 'weiba'
+    }
+
+    addEventListener('keydown', e => {
+      if (e.key == 'ArrowUp') {
+        if (direction !== 'down') {
+          direction = 'up'
+        }
+      } else if (e.key == 'ArrowDown') {
+        if (direction !== 'up') {
+          direction = 'down'
+        }
+      } else if (e.key == 'ArrowLeft') {
+        if (direction !== 'right') {
+          direction = 'left'
+        }
+      } else if (e.key == 'ArrowRight') {
+        if (direction !== 'left') {
+          direction = 'right'
+        }
+      }
+    })
+    addEventListener('keydown', e => {
+      if (e.key == 'q') {
+        beilv = 0.3
+      }
+    })
+    addEventListener('keyup', e => {
+      if (e.key == 'q') {
+        beilv = 1
+      }
+    })
+    startgame.addEventListener('click', e => {
+      shouldRunning = true
+      chushihua()
+      start()
+    })
+  </script>
+</body>
+
+</html>
